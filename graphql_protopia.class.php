@@ -221,9 +221,9 @@ EOF;
 			$this->log($error_text);
 			$this->log(json_encode(['query' => $query, 'variables' => $variables]));
 			echo "</pre>";
-			file_put_contents(__DIR__ . "/log.txt", print_r(json_encode(['query' => $query, 'variables' => $variables]), true), FILE_APPEND);
-			file_put_contents(__DIR__ . "/log.txt", print_r($error_text, true), FILE_APPEND);
-			file_put_contents(__DIR__ . "/log.txt", "Authorization: Bearer $token", FILE_APPEND);
+			file_put_contents(__DIR__ . "/log.txt", print_r(json_encode(['query' => $query, 'variables' => $variables]) . "\n\n", true), FILE_APPEND);
+			file_put_contents(__DIR__ . "/log.txt", print_r($error_text, true) . "\n\n", FILE_APPEND);
+			file_put_contents(__DIR__ . "/log.txt", "Authorization: Bearer $token" . "\n\n", FILE_APPEND);
 		}
 		$result = $result["data"];
 		return reset($result);

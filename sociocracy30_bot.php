@@ -11,10 +11,21 @@ require_once(__DIR__ . "/graphql_protopia.class.php");
 use Jose\Object\JWK;
 use Jose\Factory\JWSFactory;
 
+$data = json_decode(file_get_contents('php://input'), true);
+file_put_contents(__DIR__ . "/log.txt", print_r($_REQUEST, true), FILE_APPEND);
+file_put_contents(__DIR__ . "/log.txt", print_r($data, true), FILE_APPEND);
+
+if ($data["callback_query"]["message"])
+{
+	$data["message"]["from"] = $data["callback_query"]["from"];
+	$data["message"]["chat"] = $data["callback_query"]["message"]["chat"];
+}
+
 session_id("sociocracy30bot" . $data["message"]["from"]["id"]);
 session_start();
 
 $graphql_protopia = new graphql_protopia($ecosystem_addr, $ecosystem_client_id, $ecosystem_client_url, $ecosystem_client_secret, "telegram", $data["message"]["from"]["id"]);
+
 if(!$graphql_protopia->ecosystem_user_token)
 {
 	$user = $graphql_protopia->protopia_mutation("registerUser", "_id", ["input: UserInput" => [
@@ -30,10 +41,11 @@ $chat_object = $graphql_protopia->protopia_query("getChatByExternal", "_id", ["i
 	"external_system" => "telegram",
 	"external_type" => $data["message"]["chat"]["id"] == $data["message"]["from"]["id"] ? "personal_chat" : "group_chat",
 ]]);
+
 if (!$chat_object)
 {
 	$chat_object = $graphql_protopia->protopia_mutation("changeChat", "_id", ["input: ChatInput" => [
-		"title" => $data["message"]["chat"]["title"]
+		"title" => $data["message"]["chat"]["title"],
 		"external_id" => $data["message"]["chat"]["id"],
 		"external_system" => "telegram",
 		"external_type" => $data["message"]["chat"]["id"] == $data["message"]["from"]["id"] ? "personal_chat" : "group_chat",
@@ -61,13 +73,14 @@ elseif (preg_match("#^\/vote_menu$#s", $data["message"]["text"], $matches))
 {
 	$_SESSION = [];
 	
-	$proposals = $graphql_protopia->protopia_query("getProposals", "_id title");
+	$proposals = $graphql_protopia->protopia_query("getProposalsForChat", "_id title", ["chat_id:ID!" => $chat_object["_id"]]);
+
 	foreach($proposals as &$proposal)
 	{
 		$proposal["_id"] = "vote_type|" . $proposal["_id"];
 	}
 
-	answer_one("Укажите предложение", null, null, generate_lister($proposals));
+	answer_one("Укажите предложение", null, generate_lister($proposals));
 }
 elseif (preg_match("#^vote_type\|(.*)$#s", $data["callback_query"]["data"], $matches))
 {
@@ -78,6 +91,7 @@ elseif (preg_match("#^vote_type\|(.*)$#s", $data["callback_query"]["data"], $mat
 		author {name telegram_id}
 		votes {date type author {name telegram_id}}
 	", ["id:ID!" => $matches[1]]);
+
 	$text = "";
 	$text .= "{$proposal["title"]} ([{$proposal["author"]["name"]}](tg://user?id={$proposal["author"]["telegram_id"]}))\n";
 	foreach($proposal["votes"] as $vote)
@@ -137,6 +151,7 @@ elseif (preg_match("#^vote_menu$#s", $data["callback_query"]["data"], $matches))
 	$_SESSION = [];
 	
 	$proposals = $graphql_protopia->protopia_query("getProposalsForChat", "_id title", ["chat_id:ID!" => $chat_object["_id"]]);
+
 	foreach($proposals as &$proposal)
 	{
 		$proposal["_id"] = "vote_type|" . $proposal["_id"];

@@ -19,12 +19,12 @@ function answer($text, $chat_id = null, $parse_mode = null)
 		$texts = str_split_unicode($text, 3000);
 		foreach ($texts as $text_part)
 		{
-			answer_one($text_part, $chat_id, $parse_mode);
+			answer_one($text_part, $chat_id, null, $parse_mode);
 		}
 	}
 	else
 	{
-		answer_one($text, $chat_id, $parse_mode);
+		answer_one($text, $chat_id, null, $parse_mode);
 	}
 }
 
@@ -259,4 +259,48 @@ function is_admin($chat_id = null, $user_id = null)
 {
 	$status = getChatMember($chat_id, $user_id)["status"];
 	return $status == "creator" || $status == "administrator";
+}
+
+function edit_message_text ($text, $reply_markup = null, $parse_mode = null, $chat_id = null, $message_id = null) {
+    global $data;
+	if (!$chat_id)
+	{
+            if (!$data["message"]["chat"]["id"]) {
+            $chat_id = $data["callback_query"]["message"]["chat"]["id"];
+            } else {
+            $chat_id = $data["message"]["chat"]["id"];
+            }
+	}
+        if (!$message_id) 
+        {
+            if (!$data["message"]["message_id"]) {
+            $message_id = $data["callback_query"]["message"]["message_id"];
+            } else {
+            $chat_id = $data["message"]["message_id"];
+            }
+        }
+    $answer_data = array(
+        "text" => $text,
+	"chat_id" => $chat_id,
+	"message_id" => $message_id,
+	);
+    if ($reply_markup)
+	{
+		$answer_data["reply_markup"] = json_encode($reply_markup);
+	}
+    if ($parse_mode)
+	{
+		$answer_data["parse_mode"] = $parse_mode;
+	}
+	$ch = curl_init();
+        global $bot_token;
+	curl_setopt($ch, CURLOPT_URL,"https://api.telegram.org/bot{$bot_token}/editMessageText");
+	curl_setopt($ch, CURLOPT_POST, 1);
+	curl_setopt($ch, CURLOPT_POSTFIELDS,
+				http_build_query($answer_data)
+			);
+	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+	$server_output = curl_exec ($ch);
+	curl_close ($ch);
+        return (json_decode($server_output, true));
 }
