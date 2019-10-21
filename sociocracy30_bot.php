@@ -15,6 +15,8 @@ $data = json_decode(file_get_contents('php://input'), true);
 file_put_contents(__DIR__ . "/log.txt", print_r($_REQUEST, true), FILE_APPEND);
 file_put_contents(__DIR__ . "/log.txt", print_r($data, true), FILE_APPEND);
 
+$data["message"]["text"] = preg_replace("#^(\/[a-z0-9_]+)@[a-z0-9_]+bot#i", "$1", $data["message"]["text"]);
+
 if ($data["callback_query"]["message"])
 {
 	$data["message"]["from"] = $data["callback_query"]["from"];
@@ -52,7 +54,11 @@ if (!$chat_object)
 	]]);
 }
 
-if (preg_match("#^\/add_proposal (.*)$#s", $data["message"]["text"], $matches))
+if (preg_match("#^\/add_proposal$#s", $data["message"]["text"], $matches))
+{
+	answer("Введите команду в виде \"/add_proposal текст предложения\".");
+}
+elseif (preg_match("#^\/add_proposal (.*)$#s", $data["message"]["text"], $matches))
 {
 	
 	
@@ -61,7 +67,7 @@ if (preg_match("#^\/add_proposal (.*)$#s", $data["message"]["text"], $matches))
 		"chat_id" => $chat_object["_id"],
 	]]);
 	
-    answer("Предложение добавлено!");
+    answer("Предложение добавлено! Вы можете проголосовать за него, набрав команду /vote_menu");
 }
 elseif (preg_match("#^\/token$#s", $data["message"]["text"], $matches))
 {
