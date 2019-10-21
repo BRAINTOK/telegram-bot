@@ -1,0 +1,7 @@
+{
+    "require": {
+        "firebase/php-jwt": "^5.0",
+        "spomky-labs/jose": "*",
+        "gamegos/jws": "^1.0"
+    }
+}
