@@ -94,16 +94,16 @@ elseif (preg_match("#^vote_type\|(.*)$#s", $data["callback_query"]["data"], $mat
 	
 	$proposal = $graphql_protopia->protopia_query("getProposal", "_id
 		title
-		author {name telegram_id}
-		votes {date type author {name telegram_id}}
+		author {name family_name telegram_id}
+		votes {date type author {name family_name telegram_id}}
 	", ["id:ID!" => $matches[1]]);
 
 	$text = "";
-	$text .= "{$proposal["title"]} ([{$proposal["author"]["name"]}](tg://user?id={$proposal["author"]["telegram_id"]}))\n";
+	$text .= "{$proposal["title"]} ([{$proposal["author"]["name"]} {$proposal["author"]["family_name"]}](tg://user?id={$proposal["author"]["telegram_id"]}))\n";
 	foreach($proposal["votes"] as $vote)
 	{
 		$vote["date"] = date("Y-m-d H:i:s", strtotime($vote["date"]));
-		$text .= "----[{$vote["author"]["name"]}](tg://user?id={$vote["author"]["telegram_id"]}): {$vote["type"]} ({$vote["date"]})\n";
+		$text .= "----[{$vote["author"]["name"]} {$vote["author"]["family_name"]}](tg://user?id={$vote["author"]["telegram_id"]}): {$vote["type"]} ({$vote["date"]})\n";
 	}
 	$text .= "\n";
 	
@@ -125,15 +125,15 @@ elseif (preg_match("#^vote_send\|(.*)\|(.*)$#s", $data["callback_query"]["data"]
 
 	$proposal = $graphql_protopia->protopia_query("getProposal", "_id
 		title
-		author {name telegram_id}
-		votes {date type author {name telegram_id}}
+		author {name family_name telegram_id}
+		votes {date type author {name family_name telegram_id}}
 	", ["id:ID!" => $matches[1]]);
 	$text = "";
-	$text .= "{$proposal["title"]} ([{$proposal["author"]["name"]}](tg://user?id={$proposal["author"]["telegram_id"]}))\n";
+	$text .= "{$proposal["title"]} ([{$proposal["author"]["name"]} {$proposal["author"]["family_name"]}](tg://user?id={$proposal["author"]["telegram_id"]}))\n";
 	foreach($proposal["votes"] as $vote)
 	{
 		$vote["date"] = date("Y-m-d H:i:s", strtotime($vote["date"]));
-		$text .= "----[{$vote["author"]["name"]}](tg://user?id={$vote["author"]["telegram_id"]}): {$vote["type"]} ({$vote["date"]})\n";
+		$text .= "----[{$vote["author"]["name"]} {$vote["author"]["family_name"]}](tg://user?id={$vote["author"]["telegram_id"]}): {$vote["type"]} ({$vote["date"]})\n";
 	}
 	$text .= "\n";
 	edit_message_text("Голос учтен!\nВыберите ответ\n" . $text, generate_lister([
