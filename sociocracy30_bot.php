@@ -108,8 +108,8 @@ elseif (preg_match("#^vote_type\|(.*)$#s", $data["callback_query"]["data"], $mat
 	$text .= "\n";
 	
 	edit_message_text("Выберите ответ\n" . $text, generate_lister([
-		["_id" => "vote_send|{$matches[1]}|yes", "title" => "Да"],
-		["_id" => "vote_send|{$matches[1]}|no", "title" => "Нет"],
+		["_id" => "vote_send|{$matches[1]}|yes", "title" => "Согласие"],
+		["_id" => "vote_send|{$matches[1]}|no", "title" => "Возражение"],
 		["_id" => "vote_send|{$matches[1]}|doubt", "title" => "Сомнение"],
 		["_id" => "vote_menu", "title" => "Другое предложение"],
 	]), "markdown");
@@ -137,8 +137,8 @@ elseif (preg_match("#^vote_send\|(.*)\|(.*)$#s", $data["callback_query"]["data"]
 	}
 	$text .= "\n";
 	edit_message_text("Голос учтен!\nВыберите ответ\n" . $text, generate_lister([
-		["_id" => "vote_send|{$matches[1]}|yes", "title" => "Да"],
-		["_id" => "vote_send|{$matches[1]}|no", "title" => "Нет"],
+		["_id" => "vote_send|{$matches[1]}|yes", "title" => "Согласие"],
+		["_id" => "vote_send|{$matches[1]}|no", "title" => "Возражение"],
 		["_id" => "vote_send|{$matches[1]}|doubt", "title" => "Сомнение"],
 		["_id" => "vote_menu", "title" => "Другое предложение"],
 	]), "markdown");
