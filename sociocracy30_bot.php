@@ -99,11 +99,11 @@ elseif (preg_match("#^vote_type\|(.*)$#s", $data["callback_query"]["data"], $mat
 	", ["id:ID!" => $matches[1]]);
 
 	$text = "";
-	$text .= "{$proposal["title"]} ([{$proposal["author"]["name"]} {$proposal["author"]["family_name"]}](tg://user?id={$proposal["author"]["telegram_id"]}))\n";
+	$text .= "{$proposal["title"]} (<a href=\"tg://user?id={$proposal["author"]["telegram_id"]}\">{$proposal["author"]["name"]} {$proposal["author"]["family_name"]}</a>)\n";
 	foreach($proposal["votes"] as $vote)
 	{
 		$vote["date"] = date("Y-m-d H:i:s", strtotime($vote["date"]));
-		$text .= "----[{$vote["author"]["name"]} {$vote["author"]["family_name"]}](tg://user?id={$vote["author"]["telegram_id"]}): {$vote["type"]} ({$vote["date"]})\n";
+		$text .= "----<a href=\"tg://user?id={$vote["author"]["telegram_id"]}\">{$vote["author"]["name"]} {$vote["author"]["family_name"]}</a>: {$vote["type"]} ({$vote["date"]})\n";
 	}
 	$text .= "\n";
 	
@@ -112,7 +112,7 @@ elseif (preg_match("#^vote_type\|(.*)$#s", $data["callback_query"]["data"], $mat
 		["_id" => "vote_send|{$matches[1]}|no", "title" => "Возражение"],
 		["_id" => "vote_send|{$matches[1]}|doubt", "title" => "Сомнение"],
 		["_id" => "vote_menu", "title" => "Другое предложение"],
-	]), "markdown");
+	]), "html");
 }
 elseif (preg_match("#^vote_send\|(.*)\|(.*)$#s", $data["callback_query"]["data"], $matches))
 {
@@ -129,11 +129,11 @@ elseif (preg_match("#^vote_send\|(.*)\|(.*)$#s", $data["callback_query"]["data"]
 		votes {date type author {name family_name telegram_id}}
 	", ["id:ID!" => $matches[1]]);
 	$text = "";
-	$text .= "{$proposal["title"]} ([{$proposal["author"]["name"]} {$proposal["author"]["family_name"]}](tg://user?id={$proposal["author"]["telegram_id"]}))\n";
+	$text .= "{$proposal["title"]} (<a href=\"tg://user?id={$proposal["author"]["telegram_id"]}\">{$proposal["author"]["name"]} {$proposal["author"]["family_name"]}</a>)\n";
 	foreach($proposal["votes"] as $vote)
 	{
 		$vote["date"] = date("Y-m-d H:i:s", strtotime($vote["date"]));
-		$text .= "----[{$vote["author"]["name"]} {$vote["author"]["family_name"]}](tg://user?id={$vote["author"]["telegram_id"]}): {$vote["type"]} ({$vote["date"]})\n";
+		$text .= "----<a href=\"tg://user?id={$vote["author"]["telegram_id"]}\">{$vote["author"]["name"]} {$vote["author"]["family_name"]}</a>: {$vote["type"]} ({$vote["date"]})\n";
 	}
 	$text .= "\n";
 	edit_message_text("Голос учтен!\nВыберите ответ\n" . $text, generate_lister([
@@ -141,15 +141,15 @@ elseif (preg_match("#^vote_send\|(.*)\|(.*)$#s", $data["callback_query"]["data"]
 		["_id" => "vote_send|{$matches[1]}|no", "title" => "Возражение"],
 		["_id" => "vote_send|{$matches[1]}|doubt", "title" => "Сомнение"],
 		["_id" => "vote_menu", "title" => "Другое предложение"],
-	]), "markdown");
+	]), "html");
 	
 	if ($matches[2] == "doubt")
 	{
-		answer("[{$data["message"]["from"]["first_name"]} {$data["message"]["from"]["last_name"]}](tg://user?id={$data["message"]["from"]["id"]}), не забудьте написать, в чем ваше сомнение", null, "markdown");
+		answer("<a href=\"tg://user?id={$data["message"]["from"]["id"]}\">{$data["message"]["from"]["first_name"]} {$data["message"]["from"]["last_name"]}</a>, не забудьте написать, в чем ваше сомнение", null, "html");
 	}
 	if ($matches[2] == "no")
 	{
-		answer("[{$data["message"]["from"]["first_name"]} {$data["message"]["from"]["last_name"]}](tg://user?id={$data["message"]["from"]["id"]}), не забудьте написать, в чем ваше возражение", null, "markdown");
+		answer("<a href=\"tg://user?id={$data["message"]["from"]["id"]}\">{$data["message"]["from"]["first_name"]} {$data["message"]["from"]["last_name"]}</a>, не забудьте написать, в чем ваше возражение", null, "html");
 	}
 }
 elseif (preg_match("#^vote_menu$#s", $data["callback_query"]["data"], $matches))
