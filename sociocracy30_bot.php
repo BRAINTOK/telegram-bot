@@ -27,6 +27,9 @@ session_id("sociocracy30bot" . $data["message"]["from"]["id"]);
 session_start();
 
 $graphql_protopia = new graphql_protopia($ecosystem_addr, $ecosystem_client_id, $ecosystem_client_url, $ecosystem_client_secret, "telegram", $data["message"]["from"]["id"]);
+if ($graphql_protopia->ecosystem_user_token) {
+	$user = $graphql_protopia->protopia_query("userInfo", "roles");
+}
 
 if(!$graphql_protopia->ecosystem_user_token)
 {
@@ -69,10 +72,8 @@ elseif (preg_match("#^\/add_proposal (.*)$#s", $data["message"]["text"], $matche
 	
     answer("Предложение добавлено! Вы можете проголосовать за него, набрав команду /vote_menu");
 }
-elseif (preg_match("#^\/token$#s", $data["message"]["text"], $matches))
+elseif (preg_match("#^\/token$#s", $data["message"]["text"], $matches) && in_array("admin", $user["roles"]))
 {
-
-
     answer($graphql_protopia->ecosystem_user_token);
 }
 elseif (preg_match("#^\/vote_menu$#s", $data["message"]["text"], $matches))
