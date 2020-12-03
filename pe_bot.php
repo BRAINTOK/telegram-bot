@@ -57,6 +57,8 @@ if (!$chat_object)
 	]]);
 }
 
+session_write_close();
+
 function generate_lister ($total) {
     $list = array();
     for ($i=0;$i<count($total); $i++) {
