@@ -2,3 +2,6 @@
 /*.txt
 /config.php
 /vendor
+
+.idea
+.idea/
